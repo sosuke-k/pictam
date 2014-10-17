@@ -3,8 +3,6 @@ package android.pictam.sakailab.com.pictam;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 
 public class MainActivity extends Activity {
 
@@ -16,5 +14,4 @@ public class MainActivity extends Activity {
         startActivity(intent);
         finish();
     }
-
 }

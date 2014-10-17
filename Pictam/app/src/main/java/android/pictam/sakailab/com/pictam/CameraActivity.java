@@ -16,7 +16,6 @@ public class CameraActivity extends Activity {
     private CameraPreviewView mCameraPreview;
     private ImageView mDummyImage;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,6 +41,12 @@ public class CameraActivity extends Activity {
         objectAnimator.setDuration(1000);
         objectAnimator.setRepeatCount(1000);
         objectAnimator.start();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
     }
 
     private boolean checkHasBackCamera() {
