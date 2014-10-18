@@ -1,13 +1,8 @@
 package android.pictam.sakailab.com.pictam;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.ImageFormat;
-import android.graphics.Rect;
-import android.graphics.YuvImage;
 import android.hardware.Camera;
 
-import java.io.ByteArrayOutputStream;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -30,8 +25,11 @@ public class TakePreviewWorker {
 
         @Override
         public void run() {
-            Bitmap bitmap = retrievePreviewImage(mImageData);
-            mCallBack.callBackTakePreview(bitmap);
+            //TODO
+            //NDKにbyte配列を渡して座標を取得
+            //コールバック
+
+//            mCallBack.callBackTakePreview(bitmap);
         }
     }
 
@@ -56,24 +54,6 @@ public class TakePreviewWorker {
     public TakePreviewWorker(Camera camera, TakePreviewCallBack callBack) {
         mCamera = camera;
         mCallBack = callBack;
-    }
-
-    private Bitmap retrievePreviewImage(byte[] data) {
-        int previewWidth = mCamera.getParameters().getPreviewSize().width;
-        int previewHeight = mCamera.getParameters().getPreviewSize().height;
-        return getBitmapImageFromYUV(data, previewWidth, previewHeight);
-    }
-
-    private Bitmap getBitmapImageFromYUV(byte[] data, int width, int height) {
-        YuvImage yuvimage = new YuvImage(data, ImageFormat.NV21, width, height, null);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        yuvimage.compressToJpeg(new Rect(0, 0, width, height), 80, baos);
-        byte[] jdata = baos.toByteArray();
-
-        BitmapFactory.Options bitmapFatoryOptions = new BitmapFactory.Options();
-        bitmapFatoryOptions.inPreferredConfig = Bitmap.Config.RGB_565;
-        Bitmap bmp = BitmapFactory.decodeByteArray(jdata, 0, jdata.length, bitmapFatoryOptions);
-        return bmp;
     }
 
     static interface TakePreviewCallBack {

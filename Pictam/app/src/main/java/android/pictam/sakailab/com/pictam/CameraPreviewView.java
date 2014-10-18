@@ -2,6 +2,7 @@ package android.pictam.sakailab.com.pictam;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
@@ -45,31 +46,12 @@ public class CameraPreviewView extends TextureView implements
         }
     };
 
-    @Override
-    public void onSurfaceTextureAvailable(SurfaceTexture surface, int width,
-                                          int height) {
-        mCamera = Camera.open();
-        try {
-            mCamera.setPreviewTexture(surface);
-            mCamera.startPreview();
-            setCameraDisplayOrientation();
-
-            //最適なカメラプレビューサイズを取得して適応し、またビューサイズとマッチさせる
-            Camera.Size previewSize = getMidiumPreviewSize();
-            Parameters param = mCamera.getParameters();
-            setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
-            param.setPreviewSize(previewSize.width, previewSize.height);
-
-            mCamera.setParameters(param);
-            mCamera.setPreviewCallback(mPreviewCallBack);
-            mTakePreviewWorker = new TakePreviewWorker(mCamera, mTakePreviewCallBack);
-        } catch (IOException io) {
-            io.printStackTrace();
-        }
+    public CameraPreviewView(Context context) {
+        super(context);
+        mContext = context;
     }
 
-    private Camera.Size getMidiumPreviewSize() {
+    private Camera.Size getMiddlePreviewSize() {
         List<Camera.Size> sizeList = mCamera.getParameters()
                 .getSupportedPreviewSizes();
         int index = sizeList.size() / 2;
@@ -79,6 +61,36 @@ public class CameraPreviewView extends TextureView implements
     private void setCameraDisplayOrientation() {
         int degrees = (90 + 360) % 360;
         mCamera.setDisplayOrientation(degrees);
+    }
+
+    @Override
+    public void onSurfaceTextureAvailable(SurfaceTexture surface, int width,
+                                          int height) {
+        mCamera = Camera.open();
+        try {
+            mCamera.setPreviewTexture(surface);
+            mCamera.startPreview();
+            setCameraDisplayOrientation();
+
+            //最適なカメラプレビューサイズを取得して適応する
+            Camera.Size previewSize = getMiddlePreviewSize();
+            Parameters param = mCamera.getParameters();
+            param.setPreviewSize(previewSize.width, previewSize.height);
+
+            //ビューサイズを最大化しておく
+            setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
+
+            //プレビュー取得の際の画像のピクセルフォーマットをRGBにする
+            param.setPreviewFormat(ImageFormat.RGB_565);
+
+            mCamera.setParameters(param);
+            mCamera.setPreviewCallback(mPreviewCallBack);
+
+            mTakePreviewWorker = new TakePreviewWorker(mCamera, mTakePreviewCallBack);
+        } catch (IOException io) {
+            io.printStackTrace();
+        }
     }
 
     @Override
@@ -98,9 +110,5 @@ public class CameraPreviewView extends TextureView implements
     public void onSurfaceTextureUpdated(SurfaceTexture surface) {
     }
 
-    public CameraPreviewView(Context context) {
-        super(context);
-        mContext = context;
-    }
 
 }
