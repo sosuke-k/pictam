@@ -1,52 +1,39 @@
 package android.pictam.sakailab.com.pictam;
 
-import android.animation.ObjectAnimator;
-import android.app.Activity;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 /**
  * Created by taisho6339 on 2014/10/17.
  */
-public class CameraActivity extends Activity {
+public class CameraActivity extends FragmentActivity implements CameraPreviewView.OnMatchTemplateListener {
 
-    private FrameLayout mDrawFrame;
-    private CameraPreviewView mCameraPreview;
-    private ImageView mDummyImage;
+    private ImageAnimationFragment mAnimFragment;
+
+    @Override
+    public void onMatchTemplate(int i, int j) {
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mDrawFrame = new FrameLayout(this);
-        mDrawFrame.setLayoutParams(new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT));
-        mCameraPreview = new CameraPreviewView(this);
-        mDummyImage = new ImageView(this);
-        mDummyImage.setBackgroundResource(R.drawable.ic_launcher);
+        setContentView(R.layout.activity_camera_view);
+        initViews();
+    }
+
+    private void initViews() {
+        FrameLayout cameraFrame = (FrameLayout) findViewById(R.id.camera_container);
+        CameraPreviewView cameraPreview = new CameraPreviewView(this);
         boolean hasBackCamera = checkHasBackCamera();
         if (hasBackCamera) {
-            mCameraPreview.setSurfaceTextureListener(mCameraPreview);
-            mDrawFrame.addView(mCameraPreview);
-            mDrawFrame.addView(mDummyImage);
+            cameraPreview.addOnMatchTemplateListener(this);
+            cameraFrame.addView(cameraPreview);
         }
-        setContentView(mDrawFrame);
-        animateRotation(mDummyImage);
-    }
-
-    private void animateRotation(ImageView target) {
-        ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(target, "rotation", 0f, 360f);
-        objectAnimator.setDuration(1000);
-        objectAnimator.setRepeatCount(1000);
-        objectAnimator.start();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
+        mAnimFragment = new ImageAnimationFragment();
+        getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, mAnimFragment).commit();
     }
 
     private boolean checkHasBackCamera() {

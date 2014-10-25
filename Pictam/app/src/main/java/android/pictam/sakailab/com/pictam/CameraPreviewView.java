@@ -17,22 +17,26 @@ import java.io.IOException;
 import java.util.List;
 
 public class CameraPreviewView extends TextureView implements
-        TextureView.SurfaceTextureListener {
+        TextureView.SurfaceTextureListener,
+        RetrieveMatchPointWorker.RetrieveMatchPointCallBack {
+
+    private final static int MAX_PREVIEW_COUNT = 10;
 
     private Camera mCamera = null;
     private Context mContext;
-
     private int mCount = 0;
-    private final static int MAX_PREVIEW_COUNT = 10;
+    private OnMatchTemplateListener mMatchCallBack = null;
 
     //プレジュー画像をキャプチャするためのスレッド管理クラスコールバック
-    private TakePreviewWorker mTakePreviewWorker;
-    private TakePreviewWorker.TakePreviewCallBack mTakePreviewCallBack = new TakePreviewWorker.TakePreviewCallBack() {
-        @Override
-        public void callBackTakePreview(Bitmap bitmap) {
-            Log.d(Config.DEBUG_TAG, "callback create preview bitmap");
+    private RetrieveMatchPointWorker mTakePreviewWorker;
+
+    @Override
+    public void callBackRetrieve(int i, int j) {
+        if (mMatchCallBack == null) {
+            return;
         }
-    };
+        mMatchCallBack.onMatchTemplate(i, j);
+    }
 
     private Camera.PreviewCallback mPreviewCallBack = new Camera.PreviewCallback() {
         @Override
@@ -49,6 +53,11 @@ public class CameraPreviewView extends TextureView implements
     public CameraPreviewView(Context context) {
         super(context);
         mContext = context;
+        setSurfaceTextureListener(this);
+    }
+
+    public void addOnMatchTemplateListener(OnMatchTemplateListener listener) {
+        mMatchCallBack = listener;
     }
 
     private Camera.Size getMiddlePreviewSize() {
@@ -63,9 +72,7 @@ public class CameraPreviewView extends TextureView implements
         mCamera.setDisplayOrientation(degrees);
     }
 
-    @Override
-    public void onSurfaceTextureAvailable(SurfaceTexture surface, int width,
-                                          int height) {
+    private void initializeCamera(SurfaceTexture surface) {
         mCamera = Camera.open();
         try {
             mCamera.setPreviewTexture(surface);
@@ -77,20 +84,21 @@ public class CameraPreviewView extends TextureView implements
             Parameters param = mCamera.getParameters();
             param.setPreviewSize(previewSize.width, previewSize.height);
 
-            //ビューサイズを最大化しておく
-            setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
-
-            //プレビュー取得の際の画像のピクセルフォーマットをRGBにする
-            param.setPreviewFormat(ImageFormat.RGB_565);
-
             mCamera.setParameters(param);
             mCamera.setPreviewCallback(mPreviewCallBack);
-
-            mTakePreviewWorker = new TakePreviewWorker(mCamera, mTakePreviewCallBack);
+            mTakePreviewWorker = new RetrieveMatchPointWorker(this);
         } catch (IOException io) {
             io.printStackTrace();
         }
+    }
+
+    @Override
+    public void onSurfaceTextureAvailable(SurfaceTexture surface, int width,
+                                          int height) {
+        //ビューサイズを最大化しておく
+        setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER));
+        initializeCamera(surface);
     }
 
     @Override
@@ -110,5 +118,9 @@ public class CameraPreviewView extends TextureView implements
     public void onSurfaceTextureUpdated(SurfaceTexture surface) {
     }
 
+    //テンプレートマッチングの結果取得コールバック
+    public interface OnMatchTemplateListener {
+        public void onMatchTemplate(int i, int j);
+    }
 
 }

@@ -1,4 +1,4 @@
-package android.pictam.sakailab.com.pictam;
+package android.pictam.sakailab.com.pictam.app;
 
 import android.app.Application;
 

@@ -1,8 +1,5 @@
 package android.pictam.sakailab.com.pictam;
 
-import android.graphics.Bitmap;
-import android.hardware.Camera;
-
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -10,13 +7,12 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by taisho6339 on 2014/10/17.
  */
-public class TakePreviewWorker {
+public class RetrieveMatchPointWorker {
 
-    private Camera mCamera;
     private ExecutorService mWorker = Executors.newSingleThreadExecutor();
-    private TakePreviewCallBack mCallBack;
+    private RetrieveMatchPointCallBack mCallBack;
 
-    class TakePreviewTask implements Runnable {
+    private class TakePreviewTask implements Runnable {
         private byte[] mImageData;
 
         TakePreviewTask(byte[] data) {
@@ -26,9 +22,10 @@ public class TakePreviewWorker {
         @Override
         public void run() {
             //TODO
+            //YUVフォーマットからRGBに変換
             //NDKにbyte配列を渡して座標を取得
             //コールバック
-
+//            mCallBack.callBackRetrieve();
 //            mCallBack.callBackTakePreview(bitmap);
         }
     }
@@ -51,12 +48,11 @@ public class TakePreviewWorker {
         }
     }
 
-    public TakePreviewWorker(Camera camera, TakePreviewCallBack callBack) {
-        mCamera = camera;
+    public RetrieveMatchPointWorker(RetrieveMatchPointCallBack callBack) {
         mCallBack = callBack;
     }
 
-    static interface TakePreviewCallBack {
-        public void callBackTakePreview(Bitmap bitmap);
+    static interface RetrieveMatchPointCallBack {
+        public void callBackRetrieve(int i, int j);
     }
 }
