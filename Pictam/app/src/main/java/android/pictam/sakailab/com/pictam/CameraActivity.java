@@ -2,9 +2,14 @@ package android.pictam.sakailab.com.pictam;
 
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.pictam.sakailab.com.pictam.config.Config;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
+
+import org.opencv.android.BaseLoaderCallback;
+import org.opencv.android.LoaderCallbackInterface;
+import org.opencv.android.OpenCVLoader;
 
 /**
  * Created by taisho6339 on 2014/10/17.
@@ -12,16 +17,33 @@ import android.widget.ImageView;
 public class CameraActivity extends FragmentActivity implements CameraPreviewView.OnMatchTemplateListener {
 
     private ImageAnimationFragment mAnimFragment;
+    private BaseLoaderCallback mOpenCVCallBack = new BaseLoaderCallback(this) {
+        @Override
+        public void onManagerConnected(int status) {
+            switch (status) {
+                case LoaderCallbackInterface.SUCCESS: {
+                    setContentView(R.layout.activity_camera_view);
+                    initViews();
+                }
+                break;
+                default: {
+                    super.onManagerConnected(status);
+                }
+                break;
+            }
+        }
+    };
 
     @Override
     public void onMatchTemplate(int i, int j) {
+        Log.d(Config.DEBUG_TAG, "i:" + i + "j:" + j);
+        mAnimFragment.moveImageFrameByPixels(i, j);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_camera_view);
-        initViews();
+        OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_2_4_2, this, mOpenCVCallBack);
     }
 
     private void initViews() {
@@ -32,6 +54,7 @@ public class CameraActivity extends FragmentActivity implements CameraPreviewVie
             cameraPreview.addOnMatchTemplateListener(this);
             cameraFrame.addView(cameraPreview);
         }
+
         mAnimFragment = new ImageAnimationFragment();
         getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, mAnimFragment).commit();
     }

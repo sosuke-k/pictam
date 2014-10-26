@@ -11,6 +11,7 @@ public class RetrieveMatchPointWorker {
 
     private ExecutorService mWorker = Executors.newSingleThreadExecutor();
     private RetrieveMatchPointCallBack mCallBack;
+    private TemplateMatch mTempMatcher = new TemplateMatch();
 
     private class TakePreviewTask implements Runnable {
         private byte[] mImageData;
@@ -27,6 +28,9 @@ public class RetrieveMatchPointWorker {
             //コールバック
 //            mCallBack.callBackRetrieve();
 //            mCallBack.callBackTakePreview(bitmap);
+            mTempMatcher.setSearchImg(mImageData);
+            int[] point = mTempMatcher.match();
+            mCallBack.callBackRetrieve(point[0], point[1]);
         }
     }
 
