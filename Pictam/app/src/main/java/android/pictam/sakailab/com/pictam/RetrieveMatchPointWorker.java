@@ -1,6 +1,6 @@
 package android.pictam.sakailab.com.pictam;
 
-import android.graphics.Bitmap;
+import android.os.Handler;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -14,6 +14,7 @@ public class RetrieveMatchPointWorker {
     private ExecutorService mWorker = Executors.newSingleThreadExecutor();
     private RetrieveMatchPointCallBack mCallBack;
     private TemplateMatch mTempMatcher = new TemplateMatch();
+    private Handler mHandler = new Handler();
 
     private class TakePreviewTask implements Runnable {
         private byte[] mImageData;
@@ -31,9 +32,14 @@ public class RetrieveMatchPointWorker {
 //            mCallBack.callBackRetrieve();
 //            mCallBack.callBackTakePreview(bitmap);
             mTempMatcher.setSearchImg(mImageData);
-            int[] point = mTempMatcher.match();
+            final int[] point = mTempMatcher.match();
 //            mCallBack.callBackRetrieve(point);
-            mCallBack.callBackRetrieve(point[0], point[1]);
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    mCallBack.callBackRetrieve(point[0], point[1]);
+                }
+            });
         }
     }
 
