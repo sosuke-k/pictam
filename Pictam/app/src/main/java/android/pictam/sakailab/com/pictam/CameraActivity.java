@@ -1,7 +1,9 @@
 package android.pictam.sakailab.com.pictam;
 
 import android.os.Bundle;
+import android.pictam.sakailab.com.pictam.config.Config;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
@@ -41,9 +43,9 @@ public class CameraActivity extends FragmentActivity implements
         }
     };
 
-
     @Override
     public void onMatchTemplate(int i, int j) {
+        Log.d(Config.DEBUG_TAG, "i:" + i + " j:" + j);
         mAnimFragment.moveImageFrameByPixels(i, j);
     }
 
@@ -54,7 +56,7 @@ public class CameraActivity extends FragmentActivity implements
             mCount++;
             return imageMat;
         }
-//        mTakePreviewWorker.registerTakePreviewTask(imageMat);
+        mTakePreviewWorker.registerTakePreviewTask(imageMat);
         mCount = 0;
         return imageMat;
     }
@@ -85,6 +87,7 @@ public class CameraActivity extends FragmentActivity implements
     private void initViews() {
         mCameraView = (CameraBridgeViewBase) findViewById(R.id.camera_view);
         mCameraView.setCvCameraViewListener(this);
+//        mCameraView.setMaxFrameSize();
         mCameraView.enableView();
         mAnimFragment = new ImageAnimationFragment();
         getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, mAnimFragment).commit();

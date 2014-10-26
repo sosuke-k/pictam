@@ -44,6 +44,9 @@ public class RetrieveMatchPointWorker {
     }
 
     public void registerTakePreviewTask(Mat data) {
+        if (mWorker.isShutdown()) {
+            return;
+        }
         TakePreviewTask task = new TakePreviewTask(data);
         mWorker.submit(task);
     }

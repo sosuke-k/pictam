@@ -61,7 +61,7 @@ public class NativeCameraView extends CameraBridgeViewBase {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } finally {
-                mThread =  null;
+                mThread = null;
                 mStopThread = false;
             }
         }
@@ -73,13 +73,13 @@ public class NativeCameraView extends CameraBridgeViewBase {
     public static class OpenCvSizeAccessor implements ListItemAccessor {
 
         public int getWidth(Object obj) {
-            Size size  = (Size)obj;
-            return (int)size.width;
+            Size size = (Size) obj;
+            return (int) size.width;
         }
 
         public int getHeight(Object obj) {
-            Size size  = (Size)obj;
-            return (int)size.height;
+            Size size = (Size) obj;
+            return (int) size.height;
         }
 
     }
@@ -103,13 +103,16 @@ public class NativeCameraView extends CameraBridgeViewBase {
             java.util.List<Size> sizes = mCamera.getSupportedPreviewSizes();
 
             /* Select the size that fits surface considering maximum size allowed */
-            Size frameSize = calculateCameraFrameSize(sizes, new OpenCvSizeAccessor(), width, height);
+//            Size frameSize = calculateCameraFrameSize(sizes, new OpenCvSizeAccessor(), width, height);
+//            mFrameWidth = (int) frameSize.width;
+//            mFrameHeight = (int) frameSize.height;
+            int index = sizes.size() / 3;
+            mFrameWidth = (int) sizes.get(index).width;
+            mFrameHeight = (int) sizes.get(index).height;
 
-            mFrameWidth = (int)frameSize.width;
-            mFrameHeight = (int)frameSize.height;
 
             if ((getLayoutParams().width == LayoutParams.MATCH_PARENT) && (getLayoutParams().height == LayoutParams.MATCH_PARENT))
-                mScale = Math.min(((float)height)/mFrameHeight, ((float)width)/mFrameWidth);
+                mScale = Math.min(((float) height) / mFrameHeight, ((float) width) / mFrameWidth);
             else
                 mScale = 0;
 
@@ -119,8 +122,8 @@ public class NativeCameraView extends CameraBridgeViewBase {
 
             AllocateCache();
 
-            mCamera.set(Highgui.CV_CAP_PROP_FRAME_WIDTH, frameSize.width);
-            mCamera.set(Highgui.CV_CAP_PROP_FRAME_HEIGHT, frameSize.height);
+            mCamera.set(Highgui.CV_CAP_PROP_FRAME_WIDTH, mFrameWidth);
+            mCamera.set(Highgui.CV_CAP_PROP_FRAME_HEIGHT, mFrameHeight);
         }
 
         Log.i(TAG, "Selected camera frame size = (" + mFrameWidth + ", " + mFrameHeight + ")");
@@ -163,7 +166,9 @@ public class NativeCameraView extends CameraBridgeViewBase {
         private VideoCapture mCapture;
         private Mat mRgba;
         private Mat mGray;
-    };
+    }
+
+    ;
 
     private class CameraWorker implements Runnable {
 

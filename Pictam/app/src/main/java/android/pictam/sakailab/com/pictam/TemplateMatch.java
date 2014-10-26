@@ -73,7 +73,6 @@ public class TemplateMatch {
         Log.d(Config.DEBUG_TAG, "s_width:" + mSearchImg.width() + " s_height:" + mSearchImg.height());
         Log.d(Config.DEBUG_TAG, "t_width:" + sTempImgs[0].width() + " t_height:" + sTempImgs[0].height());
         Log.d(Config.DEBUG_TAG, "r_width:" + result_img.width() + " r_height:" + result_img.height());
-
         return new int[]{
                 rect.x, rect.y
         };
