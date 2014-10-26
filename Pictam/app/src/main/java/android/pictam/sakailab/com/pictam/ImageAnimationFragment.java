@@ -18,7 +18,6 @@ import java.util.Random;
 public class ImageAnimationFragment extends Fragment {
 
     private ImageView mAnimImage;
-    private FrameLayout mImageFrame;
     private View mLayout;
     private Handler mHandler = new Handler();
     private int mIndex = 0;
@@ -240,7 +239,6 @@ public class ImageAnimationFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View layout = inflater.inflate(R.layout.fragment_image_anim, null);
-        mImageFrame = (FrameLayout) layout.findViewById(R.id.image_container);
         mAnimImage = (ImageView) layout.findViewById(R.id.animation_image);
         mLayout = layout;
         startAnimation();
@@ -258,7 +256,7 @@ public class ImageAnimationFragment extends Fragment {
                 mAnimImage.setImageResource(IMAGE_ARRAY[mImageArrayIndex][mIndex++]);
                 startAnimation();
             }
-        }, 166);
+        }, 1000);
     }
 
     //テンプレートマッチングで返されたピクセルの配置場所を元にフレームを移動させる
