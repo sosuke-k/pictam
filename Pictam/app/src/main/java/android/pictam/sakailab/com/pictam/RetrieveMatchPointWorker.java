@@ -1,5 +1,7 @@
 package android.pictam.sakailab.com.pictam;
 
+import android.graphics.Bitmap;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -30,6 +32,7 @@ public class RetrieveMatchPointWorker {
 //            mCallBack.callBackTakePreview(bitmap);
             mTempMatcher.setSearchImg(mImageData);
             int[] point = mTempMatcher.match();
+//            mCallBack.callBackRetrieve(point);
             mCallBack.callBackRetrieve(point[0], point[1]);
         }
     }

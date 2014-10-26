@@ -1,5 +1,6 @@
 package android.pictam.sakailab.com.pictam;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;

@@ -16,6 +16,7 @@ import org.opencv.android.OpenCVLoader;
  */
 public class CameraActivity extends FragmentActivity implements CameraPreviewView.OnMatchTemplateListener {
 
+
     private ImageAnimationFragment mAnimFragment;
     private BaseLoaderCallback mOpenCVCallBack = new BaseLoaderCallback(this) {
         @Override

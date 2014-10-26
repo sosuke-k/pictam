@@ -38,6 +38,7 @@ public class CameraPreviewView extends TextureView implements
         mMatchCallBack.onMatchTemplate(i, j);
     }
 
+
     private Camera.PreviewCallback mPreviewCallBack = new Camera.PreviewCallback() {
         @Override
         public void onPreviewFrame(byte[] data, Camera camera) {
@@ -121,6 +122,7 @@ public class CameraPreviewView extends TextureView implements
     //テンプレートマッチングの結果取得コールバック
     public interface OnMatchTemplateListener {
         public void onMatchTemplate(int i, int j);
+//        public void onMatchTemplate(Bitmap b);
     }
 
 }
