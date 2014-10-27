@@ -22,13 +22,50 @@ public class ImageAnimationFragment extends Fragment {
     private Handler mHandler = new Handler();
     private int mIndex = 0;
 
-    private int mImageArrayIndex = 0;
+    private int mCurrentImageArrayIndex = 0;
+    private int mLoopImageArrayIndex = 1;
     private int[][] IMAGE_ARRAY = {
+            ACTION_ANIM_IMAGES,
             COUPLE_ANIM_IMAGES,
             SOCCER_ANIM_IMAGES,
             BASE_BALL_IMAGES,
             REDLIGHT_GREENLIGHT_IMAGES
     };
+
+    private static final int[] ACTION_ANIM_IMAGES = {
+            R.drawable.begining_of_animation_00000,
+            R.drawable.begining_of_animation_00001,
+            R.drawable.begining_of_animation_00002,
+            R.drawable.begining_of_animation_00003,
+            R.drawable.begining_of_animation_00004,
+            R.drawable.begining_of_animation_00005,
+            R.drawable.begining_of_animation_00006,
+            R.drawable.begining_of_animation_00007,
+            R.drawable.begining_of_animation_00008,
+            R.drawable.begining_of_animation_00009,
+            R.drawable.begining_of_animation_00010,
+            R.drawable.begining_of_animation_00011,
+            R.drawable.begining_of_animation_00012,
+            R.drawable.begining_of_animation_00013,
+            R.drawable.begining_of_animation_00014,
+            R.drawable.begining_of_animation_00015,
+            R.drawable.begining_of_animation_00016,
+            R.drawable.begining_of_animation_00017,
+            R.drawable.begining_of_animation_00018,
+            R.drawable.begining_of_animation_00019,
+            R.drawable.begining_of_animation_00020,
+            R.drawable.begining_of_animation_00021,
+            R.drawable.begining_of_animation_00022,
+            R.drawable.begining_of_animation_00023,
+            R.drawable.begining_of_animation_00024,
+            R.drawable.begining_of_animation_00025,
+            R.drawable.begining_of_animation_00026,
+            R.drawable.begining_of_animation_00027,
+            R.drawable.begining_of_animation_00028,
+            R.drawable.begining_of_animation_00029,
+    };
+
+
 
     //カップルアニメーションの画像
     private static final int[] COUPLE_ANIM_IMAGES = {
@@ -242,7 +279,7 @@ public class ImageAnimationFragment extends Fragment {
         mAnimImage = (ImageView) layout.findViewById(R.id.animation_image);
         mLayout = layout;
         startAnimation();
-        mImageArrayIndex = (new Random()).nextInt(IMAGE_ARRAY.length);
+        mLoopImageArrayIndex = (new Random()).nextInt(IMAGE_ARRAY.length - 1) + 1;
         return layout;
     }
 
@@ -250,10 +287,13 @@ public class ImageAnimationFragment extends Fragment {
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (mIndex >= IMAGE_ARRAY[mImageArrayIndex].length) {
+                if (mIndex >= IMAGE_ARRAY[mCurrentImageArrayIndex].length) {
+                    if (mCurrentImageArrayIndex == 0) {
+                        mCurrentImageArrayIndex = mLoopImageArrayIndex;
+                    }
                     mIndex = 0;
                 }
-                mAnimImage.setImageResource(IMAGE_ARRAY[mImageArrayIndex][mIndex++]);
+                mAnimImage.setImageResource(IMAGE_ARRAY[mCurrentImageArrayIndex][mIndex++]);
                 startAnimation();
             }
         }, 1000);

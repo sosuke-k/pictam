@@ -81,7 +81,9 @@ public class CameraActivity extends FragmentActivity implements
     protected void onPause() {
         super.onPause();
         //画面が非表示になる時にすべての画像演算処理を停止させる
-        mTakePreviewWorker.unregisterAllTakePreviewTask();
+        if (mTakePreviewWorker != null) {
+            mTakePreviewWorker.unregisterAllTakePreviewTask();
+        }
     }
 
     private void initViews() {
