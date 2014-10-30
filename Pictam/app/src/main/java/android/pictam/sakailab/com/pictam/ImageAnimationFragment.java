@@ -17,6 +17,10 @@ import java.util.Random;
  */
 public class ImageAnimationFragment extends Fragment {
 
+    private boolean detection = false;
+
+    private final int DEFAULT_INTERVAL = 200;
+
     private ImageView mAnimImage;
     private View mLayout;
     private Handler mHandler = new Handler();
@@ -29,7 +33,8 @@ public class ImageAnimationFragment extends Fragment {
             COUPLE_ANIM_IMAGES,
             SOCCER_ANIM_IMAGES,
             BASE_BALL_IMAGES,
-            REDLIGHT_GREENLIGHT_IMAGES
+            REDLIGHT_GREENLIGHT_IMAGES,
+            DISAPPEAR_IMAGES
     };
 
     private static final int[] ACTION_ANIM_IMAGES = {
@@ -273,34 +278,125 @@ public class ImageAnimationFragment extends Fragment {
 
     };
 
+    private static final int[] DISAPPEAR_IMAGES = {
+            R.drawable.disappear_animation_00000,
+            R.drawable.disappear_animation_00001,
+            R.drawable.disappear_animation_00002,
+            R.drawable.disappear_animation_00003,
+            R.drawable.disappear_animation_00004,
+            R.drawable.disappear_animation_00005,
+            R.drawable.disappear_animation_00006,
+            R.drawable.disappear_animation_00007,
+            R.drawable.disappear_animation_00008,
+            R.drawable.disappear_animation_00009,
+            R.drawable.disappear_animation_00010,
+            R.drawable.disappear_animation_00011,
+            R.drawable.disappear_animation_00012,
+            R.drawable.disappear_animation_00013,
+            R.drawable.disappear_animation_00014,
+            R.drawable.disappear_animation_00015,
+            R.drawable.disappear_animation_00016,
+            R.drawable.disappear_animation_00017,
+            R.drawable.disappear_animation_00018,
+            R.drawable.disappear_animation_00019,
+            R.drawable.disappear_animation_00020,
+            R.drawable.disappear_animation_00021,
+            R.drawable.disappear_animation_00022,
+            R.drawable.disappear_animation_00023,
+            R.drawable.disappear_animation_00024,
+            R.drawable.disappear_animation_00025,
+            R.drawable.disappear_animation_00026,
+            R.drawable.disappear_animation_00027,
+            R.drawable.disappear_animation_00028,
+            R.drawable.disappear_animation_00029,
+    };
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View layout = inflater.inflate(R.layout.fragment_image_anim, null);
         mAnimImage = (ImageView) layout.findViewById(R.id.animation_image);
+        mAnimImage.setVisibility(View.INVISIBLE);
         mLayout = layout;
-        startAnimation();
-        mLoopImageArrayIndex = (new Random()).nextInt(IMAGE_ARRAY.length - 1) + 1;
+        setAnimImage();
+
+//        IMAGE_ARRAY の最初と最後はループ候補からのぞく
+        mLoopImageArrayIndex = (new Random()).nextInt(IMAGE_ARRAY.length - 2) + 1;
+
         return layout;
     }
 
-    private void startAnimation() {
+    private void setAnimImage() {
+        if (!detection) {
+//            赤信号を検出していない時
+            switch (mAnimImage.getVisibility()) {
+
+//                赤信号を検出していなくてアニメーションが表示されている時
+                case View.VISIBLE:
+                    if (mCurrentImageArrayIndex != IMAGE_ARRAY.length - 1) {
+//                        消えるアニメーションにまだ以降していない時
+                        mCurrentImageArrayIndex = IMAGE_ARRAY.length - 1;
+                        mIndex = 0;
+                        mAnimImage.setImageResource(IMAGE_ARRAY[mCurrentImageArrayIndex][mIndex++]);
+
+                    } else {
+//                        消えるアニメーションを表示している時
+                        if (mIndex >= IMAGE_ARRAY[mCurrentImageArrayIndex].length) {
+//                            消えるアニメーションが終ったら非表示
+                            mAnimImage.setVisibility(View.INVISIBLE);
+                        } else {
+                            mAnimImage.setImageResource(IMAGE_ARRAY[mCurrentImageArrayIndex][mIndex++]);
+                        }
+                    }
+                    callSetAnimImageDelayed(DEFAULT_INTERVAL);
+                    break;
+
+//                赤信号を検出していなくてアニメーションも表示していない時
+                default:
+                    callSetAnimImageDelayed(DEFAULT_INTERVAL);
+            }
+        } else {
+//            赤信号を検出している時
+            switch (mAnimImage.getVisibility()) {
+
+//                赤信号を検出していてアニメーションも表示している時
+                case View.VISIBLE:
+                    if (mIndex >= IMAGE_ARRAY[mCurrentImageArrayIndex].length) {
+                        if (mCurrentImageArrayIndex == 0) {
+                            mCurrentImageArrayIndex = mLoopImageArrayIndex;
+                        }
+                        mIndex = 0;
+                    }
+                    mAnimImage.setImageResource(IMAGE_ARRAY[mCurrentImageArrayIndex][mIndex++]);
+                    callSetAnimImageDelayed(DEFAULT_INTERVAL);
+                    break;
+
+//                赤信号を検出しているけどアニメーションを表示していない時
+                default:
+                    mCurrentImageArrayIndex = 0;
+                    mIndex = 0;
+                    mAnimImage.setImageResource(IMAGE_ARRAY[mCurrentImageArrayIndex][mIndex++]);
+                    mAnimImage.setVisibility(View.VISIBLE);
+                    callSetAnimImageDelayed(DEFAULT_INTERVAL);
+            }
+        }
+    }
+
+    private void callSetAnimImageDelayed(int ms) {
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (mIndex >= IMAGE_ARRAY[mCurrentImageArrayIndex].length) {
-                    if (mCurrentImageArrayIndex == 0) {
-                        mCurrentImageArrayIndex = mLoopImageArrayIndex;
-                    }
-                    mIndex = 0;
-                }
-                mAnimImage.setImageResource(IMAGE_ARRAY[mCurrentImageArrayIndex][mIndex++]);
-                startAnimation();
+                setAnimImage();
             }
-        }, 1000);
+        }, ms);
     }
 
     //テンプレートマッチングで返されたピクセルの配置場所を元にフレームを移動させる
     public void moveImageFrameByPixels(int i, int j) {
-        mLayout.setPadding(i, j, 0, 0);
+        if (i < 0 || j < 0) {
+            detection = false;
+        } else {
+            mLayout.setPadding(i, j, 0, 0);
+            detection = true;
+        }
     }
 }
