@@ -109,17 +109,17 @@ public class NativeCameraView extends CameraBridgeViewBase {
             int index = sizes.size() / 3;
             mFrameWidth = (int) sizes.get(index).width;
             mFrameHeight = (int) sizes.get(index).height;
-
-
-            if ((getLayoutParams().width == LayoutParams.MATCH_PARENT) && (getLayoutParams().height == LayoutParams.MATCH_PARENT))
-                mScale = Math.min(((float) height) / mFrameHeight, ((float) width) / mFrameWidth);
-            else
-                mScale = 0;
+            if ((getLayoutParams().width == LayoutParams.MATCH_PARENT) && (getLayoutParams().height == LayoutParams.MATCH_PARENT)) {
+                mWidthScale = ((float) width) / mFrameWidth;
+                mHeightScale = ((float) height) / mFrameHeight;
+            } else {
+                mWidthScale = 0;
+                mHeightScale = 0;
+            }
 
             if (mFpsMeter != null) {
                 mFpsMeter.setResolution(mFrameWidth, mFrameHeight);
             }
-
             AllocateCache();
 
             mCamera.set(Highgui.CV_CAP_PROP_FRAME_WIDTH, mFrameWidth);

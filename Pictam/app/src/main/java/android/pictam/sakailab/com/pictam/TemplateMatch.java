@@ -19,6 +19,10 @@ public class TemplateMatch {
 
     private static Mat sTempImgs[] = new Mat[5];
     private Mat mSearchImg = new Mat();
+    private int mBestTempIndex;
+    private Point mBestMatchPoint = new Point();
+    private boolean mIsBestMatch = false;
+    private static final double threshold = 0.6;
 
     public TemplateMatch() {
         int[] templateIds = new int[]{
@@ -41,42 +45,80 @@ public class TemplateMatch {
         mSearchImg = data;
     }
 
+
     public int[] match() {
         Mat result_img = new Mat();
+        Mat search_img;
         double maxVal = 0.0;
         int max = 0;
         Point max_pt = new Point();
-        for (int i = 0; i < sTempImgs.length; i++) {
-            double maxVal_tmp;
-            Point max_pt_tmp;
-            Imgproc.matchTemplate(mSearchImg, sTempImgs[i], result_img, Imgproc.TM_CCOEFF_NORMED);
 
+        // get half of mSearchImg
+        //前回の探索が成功している場合、マッチした付近を成功したテンプレートで探索
+        if (mIsBestMatch) {
+            double offsetX = mBestMatchPoint.x - sTempImgs[mBestTempIndex].cols();
+            double offsetY = mBestMatchPoint.y - sTempImgs[mBestTempIndex].rows();
+            search_img = cropMat(mSearchImg, new Rect((int) offsetX, (int) offsetY, sTempImgs[mBestTempIndex].rows() * 3, sTempImgs[mBestTempIndex].rows() * 3));
+            Imgproc.matchTemplate(search_img, sTempImgs[mBestTempIndex], result_img, Imgproc.TM_CCOEFF_NORMED);
             Core.MinMaxLocResult mm = Core.minMaxLoc(result_img);
-            maxVal_tmp = mm.maxVal;
-            max_pt_tmp = mm.maxLoc;
-            if (maxVal_tmp != 0.0) {
-                if (maxVal < maxVal_tmp) {
+            if (mm.maxVal < threshold) {
+                mIsBestMatch = false;
+            } else {
+                max_pt = mm.maxLoc;
+                maxVal = mm.maxVal;
+                max = mBestTempIndex;
+            }
+        }
+
+        //失敗した場合、通常の探索へ（プレビューの上半分のみを探索）
+        if (!mIsBestMatch) {
+            search_img = cropMat(mSearchImg, new Rect(0, 0, mSearchImg.cols(), mSearchImg.rows() / 2));
+            for (int i = 0; i < sTempImgs.length; i++) {
+                double maxVal_tmp;
+                Point max_pt_tmp;
+                Imgproc.matchTemplate(search_img, sTempImgs[i], result_img, Imgproc.TM_CCOEFF_NORMED);
+                Core.MinMaxLocResult mm = Core.minMaxLoc(result_img);
+                maxVal_tmp = mm.maxVal;
+                max_pt_tmp = mm.maxLoc;
+                if (maxVal_tmp != 0.0) {
+                    if (maxVal < maxVal_tmp) {
+                        max = i;
+                        maxVal = maxVal_tmp;
+                        max_pt = max_pt_tmp;
+                    }
+                } else {
                     max = i;
                     maxVal = maxVal_tmp;
                     max_pt = max_pt_tmp;
                 }
+            }
+            //しきい値をつければ信号が変わった時を検知できる
+            if (maxVal < threshold) {
+                return new int[]{
+                        -1, -1
+                };
             } else {
-                max = i;
-                maxVal = maxVal_tmp;
-                max_pt = max_pt_tmp;
+                mIsBestMatch = true;
             }
         }
+
         Rect rect = new Rect(0, 0, sTempImgs[max].cols(), sTempImgs[max].rows());
+        mBestMatchPoint = max_pt;
+        mBestTempIndex = max;
         rect.x = (int) max_pt.x;
         rect.y = (int) max_pt.y;
 
         Log.d(Config.DEBUG_TAG, "s_width:" + mSearchImg.width() + " s_height:" + mSearchImg.height());
         Log.d(Config.DEBUG_TAG, "t_width:" + sTempImgs[0].width() + " t_height:" + sTempImgs[0].height());
         Log.d(Config.DEBUG_TAG, "r_width:" + result_img.width() + " r_height:" + result_img.height());
+
         return new int[]{
                 rect.x, rect.y
         };
     }
 
+    private Mat cropMat(Mat mSearchImg, Rect crip) {
+        return new Mat(mSearchImg, crip);
+    }
 
 }
