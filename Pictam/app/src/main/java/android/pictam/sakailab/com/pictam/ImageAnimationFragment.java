@@ -63,6 +63,12 @@ public class ImageAnimationFragment extends Fragment {
             R.drawable.begining_of_animation_00027,
             R.drawable.begining_of_animation_00028,
             R.drawable.begining_of_animation_00029,
+            R.drawable.begining_of_animation_00030,
+            R.drawable.begining_of_animation_00031,
+            R.drawable.begining_of_animation_00032,
+            R.drawable.begining_of_animation_00033,
+            R.drawable.begining_of_animation_00034,
+            R.drawable.begining_of_animation_00035,
     };
 
 
