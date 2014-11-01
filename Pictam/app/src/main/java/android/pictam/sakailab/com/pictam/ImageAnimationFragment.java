@@ -361,7 +361,7 @@ public class ImageAnimationFragment extends Fragment {
 //                赤信号を検出していてアニメーションも表示している時
                 case View.VISIBLE:
                     if (mIndex >= IMAGE_ARRAY[mCurrentImageArrayIndex].length) {
-                        if (mCurrentImageArrayIndex == 0) {
+                        if (mCurrentImageArrayIndex == 0 || mCurrentImageArrayIndex == IMAGE_ARRAY.length - 1) {
                             mCurrentImageArrayIndex = mLoopImageArrayIndex;
                         }
                         mIndex = 0;
